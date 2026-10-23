@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Origin &amp; Sharing Investigation — PhotoTrace AI{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.3); padding: 0.25rem 0.75rem; border-radius: 20px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-cyan); margin-bottom: 0.75rem;">
+        <i class="fa-solid fa-code-compare"></i> MULTI-SOURCE COMPARATIVE FORENSICS
+    </div>
+    <h1 style="font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+        Origin &amp; Sharing Investigation
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 0.95rem; max-width: 800px;">
+        Compare 2 to 6 copies of a photo obtained from different sources (messaging apps, downloads, original storage).
+        Detect downscaling, compression artifacts, stripped EXIF headers, and byte-for-byte cryptographic SHA-256 matches.
+    </p>
+</div>
+
+<!-- Comparison Dropzone -->
+<div class="cyber-card" style="margin-bottom: 2rem;">
+    <div class="upload-dropzone" id="compareDropzone" style="padding: 2.5rem 1.5rem;">
+        <div class="dropzone-radar" style="width: 55px; height: 55px; font-size: 1.4rem;">
+            <div class="radar-sweep"></div>
+            <i class="fa-solid fa-copy"></i>
+        </div>
+        <div class="dropzone-title">Drop 2 to 6 Image Copies to Cross-Examine</div>
+        <div class="dropzone-subtitle">Select multiple files from different channels (e.g. Email, WhatsApp, Cloud, Storage)</div>
+        <input type="file" id="multiFileInput" accept=".jpg,.jpeg,.png,.tiff,.tif,.webp" multiple style="display: none;">
+        <div class="dropzone-tags">
+            <span class="format-tag">Minimum 2 Copies</span>
+            <span class="format-tag">Maximum 6 Copies</span>
+            <span class="format-tag">JPEG, PNG, TIFF, WebP</span>
+        </div>
+    </div>
+
+    <!-- Selected Files List -->
+    <div id="selectedFilesList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem; margin-top: 1.25rem;"></div>
+
+    <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+        <button type="button" id="runCompareBtn" class="btn-cyber-primary" disabled>
+            <i class="fa-solid fa-play"></i> Run Origin &amp; Sharing Investigation
+        </button>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="compareLoading" style="display: none; text-align: center; padding: 3rem 1rem;">
+    <div class="scanner-spinner" style="margin: 0 auto 1rem;"></div>
+    <div style="font-family: var(--font-mono); color: var(--accent-cyan); font-size: 0.95rem;">
+        Performing comparative byte hashing &amp; chronological telemetry alignment...
+    </div>
+</div>
+
+<!-- Dynamic Results Container -->
+<div id="compareResults" style="display: none;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endblock %}

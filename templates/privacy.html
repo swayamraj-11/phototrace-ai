@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy, Security &amp; Forensic Limitations — PhotoTrace AI{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2.5rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0, 255, 157, 0.08); border: 1px solid rgba(0, 255, 157, 0.3); padding: 0.25rem 0.75rem; border-radius: 20px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-green); margin-bottom: 0.75rem;">
+        <i class="fa-solid fa-shield-halved"></i> DATA PRIVACY &amp; INVESTIGATIVE INTEGRITY
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+        Privacy Architecture &amp; Forensic Boundaries
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 1rem; max-width: 820px;">
+        Transparent documentation of how evidence is handled, processed, sanitized, and interpreted within PhotoTrace AI.
+    </p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Local Processing Policy -->
+    <div class="cyber-card" id="local" style="border-left: 4px solid var(--accent-green);">
+        <div class="cyber-card-header">
+            <div class="card-title">
+                <i class="fa-solid fa-server text-green"></i> 1. Local Server Evidence Handling
+            </div>
+            <span class="status-badge status-found">Strict Evidence Care</span>
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+            <p style="margin-bottom: 0.75rem;">
+                <strong>Ephemeral File Storage:</strong> When an image is uploaded for analysis, it is written to a private temporary file using a randomly generated UUID identifier. Once metadata extraction, hashing, and Error Level Analysis are complete, the temporary file on disk is immediately deleted.
+            </p>
+            <p style="margin-bottom: 0.75rem;">
+                <strong>Zero Public Directories:</strong> Uploaded evidence is never stored in a publicly accessible web folder or served as direct static assets to outside callers.
+            </p>
+            <p>
+                <strong>No Cloud AI Transmission:</strong> Photos are analyzed strictly on your local Flask host. They are never transmitted to OpenAI, Midjourney, Google Cloud Vision, or any remote generative AI provider without explicit user consent.
+            </p>
+        </div>
+    </div>
+
+    <!-- Map & Network Disclosures -->
+    <div class="cyber-card" style="border-left: 4px solid var(--accent-cyan);">
+        <div class="cyber-card-header">
+            <div class="card-title">
+                <i class="fa-solid fa-earth-americas" style="color: var(--accent-cyan);"></i> 2. External Network Communications (Map Tiles &amp; Geocoding)
+            </div>
+            <span class="status-badge status-found">Network Transparency</span>
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+            <p style="margin-bottom: 0.75rem;">
+                <strong>OpenStreetMap Tile Retrieval:</strong> When an uploaded photograph contains valid GPS coordinates, Leaflet requests map tiles from <code>openstreetmap.org</code> servers to display the location visually. No image bytes or file hashes are sent with these tile requests.
+            </p>
+            <p>
+                <strong>Approximate Reverse Geocoding:</strong> To provide human-readable landmark or city approximations, coordinates are queried via OpenStreetMap Nominatim with strict rate limits and caching. Results are explicitly labeled as approximate estimations.
+            </p>
+        </div>
+    </div>
+
+    <!-- Forensic Principles & Limitations -->
+    <div class="cyber-card" id="limitations" style="border-left: 4px solid var(--status-warning);">
+        <div class="cyber-card-header">
+            <div class="card-title">
+                <i class="fa-solid fa-scale-balanced" style="color: var(--status-warning);"></i> 3. Critical Investigative Boundaries &amp; Limitations
+            </div>
+            <span class="status-badge status-warning">Methodology Guidelines</span>
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+            <div class="cyber-alert cyber-alert-warning" style="margin-bottom: 1rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Core Forensic Doctrine:</strong> A digital photograph file alone cannot establish legal author identity, who first transmitted it, or the originating messaging application without physical device inspection and corroborated chain-of-custody logs.
+                </div>
+            </div>
+
+            <p style="margin-bottom: 0.75rem;">
+                <strong>Non-Invention Rule:</strong> When an EXIF field or GPS coordinate is missing from an image file, PhotoTrace AI reports "Not available in this file". We never synthesize or guess missing telemetry.
+            </p>
+            <p style="margin-bottom: 0.75rem;" id="stripping">
+                <strong>Social Media Metadata Stripping:</strong> Most modern messaging platforms (WhatsApp, Telegram, Signal) and social networks (Instagram, Facebook, X/Twitter) automatically strip EXIF metadata to protect user privacy. Stripped metadata is completely normal for shared photos and is <em>not</em> standalone evidence of fraudulent tampering.
+            </p>
+            <p style="margin-bottom: 0.75rem;">
+                <strong>Software Modification Tags:</strong> When tags like "Adobe Photoshop" or "GIMP" are detected, it confirms the file was saved using that software. This may reflect innocent cropping, rotation, or batch compression rather than illicit manipulation.
+            </p>
+            <p>
+                <strong>Comparative Earliest Copy:</strong> When comparing multiple supplied files, the copy with the oldest recorded EXIF timestamp is designated the <em>"Earliest supplied copy"</em> within the provided dataset. It is never automatically certified as the original physical capture.
+            </p>
+        </div>
+    </div>
+
+    <!-- Security Safeguards -->
+    <div class="cyber-card" style="border-left: 4px solid var(--accent-cyan);">
+        <div class="cyber-card-header">
+            <div class="card-title">
+                <i class="fa-solid fa-lock" style="color: var(--accent-cyan);"></i> 4. Hardened Security Safeguards
+            </div>
+            <span class="status-badge status-found">Defense in Depth</span>
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;">
+            <ul style="list-style-type: none; display: flex; flex-direction: column; gap: 0.6rem;">
+                <li><i class="fa-solid fa-shield text-green"></i> <strong>Magic Byte Verification:</strong> File headers are checked against true binary signatures, rejecting renamed executable or malicious scripts.</li>
+                <li><i class="fa-solid fa-shield text-green"></i> <strong>Decompression Bomb Protection:</strong> Pillow <code>MAX_IMAGE_PIXELS</code> is capped at 50 MP to neutralize pixel-flood memory exhaustion attacks.</li>
+                <li><i class="fa-solid fa-shield text-green"></i> <strong>Path Traversal Defense:</strong> All user-supplied filenames are sanitized via <code>werkzeug.utils.secure_filename</code> and stored exclusively under randomly generated UUIDs.</li>
+                <li><i class="fa-solid fa-shield text-green"></i> <strong>HTTP Security Headers:</strong> Responses enforce <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: SAMEORIGIN</code>, and restricted Content-Security-Policies.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

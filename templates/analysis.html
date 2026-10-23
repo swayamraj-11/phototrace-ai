@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+
+{% block title %}Forensic Report {{ data.report_id }} — PhotoTrace AI{% endblock %}
+
+{% block content %}
+<!-- Top Action Bar -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+            <span class="status-badge status-found"><i class="fa-solid fa-file-shield"></i> {{ data.report_id }}</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">
+                UTC: {{ data.summary.analysis_timestamp_utc }}
+            </span>
+        </div>
+        <h1 style="font-size: 1.85rem; font-weight: 700; color: #fff;">
+            {{ data.summary.original_filename }}
+        </h1>
+    </div>
+
+    <!-- Export Buttons -->
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <a href="{{ url_for('export_pdf', analysis_id=data.analysis_id) }}" class="btn-cyber-primary" target="_blank">
+            <i class="fa-solid fa-file-pdf"></i> Export PDF Report
+        </a>
+        <a href="{{ url_for('export_json', analysis_id=data.analysis_id) }}" class="btn-cyber-outline" target="_blank">
+            <i class="fa-solid fa-file-code"></i> Export JSON
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-plus"></i> New Analysis
+        </a>
+    </div>
+</div>
+
+<!-- Telemetry Summary Grid -->
+<div class="telemetry-grid">
+    <div class="telemetry-item">
+        <span class="telemetry-label"><i class="fa-solid fa-fingerprint"></i> SHA-256 Digest</span>
+        <div class="telemetry-value mono" style="font-size: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+            <span title="{{ data.summary.sha256 }}">{{ data.summary.sha256[:18] }}...{{ data.summary.sha256[-8:] }}</span>
+            <button type="button" class="copy-btn" onclick="copyToClipboard('{{ data.summary.sha256 }}', this)">
+                <i class="fa-regular fa-copy"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="telemetry-item">
+        <span class="telemetry-label"><i class="fa-solid fa-hard-drive"></i> Size &amp; Format</span>
+        <div class="telemetry-value">
+            {{ data.summary.file_size_formatted }} <span style="font-size: 0.8rem; color: var(--accent-cyan); font-family: var(--font-mono);">({{ data.summary.format }})</span>
+        </div>
+    </div>
+
+    <div class="telemetry-item">
+        <span class="telemetry-label"><i class="fa-solid fa-vector-square"></i> Raster Geometry</span>
+        <div class="telemetry-value">
+            {{ data.summary.dimensions }} <span style="font-size: 0.8rem; color: var(--text-muted);">({{ data.image_properties.megapixels }})</span>
+        </div>
+    </div>
+
+    <div class="telemetry-item">
+        <span class="telemetry-label"><i class="fa-solid fa-chart-pie"></i> Metadata Completeness</span>
+        <div class="telemetry-value" style="color: {% if data.summary.completeness_score > 60 %}var(--accent-green){% elif data.summary.completeness_score > 30 %}var(--status-warning){% else %}var(--status-na){% endif %};">
+            {{ data.summary.completeness_score }}%
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">({{ data.summary.completeness_ratio }})</span>
+        </div>
+    </div>
+</div>
+
+<!-- Forensic Integrity Summary Banner -->
+<div class="cyber-card" style="margin-bottom: 1.5rem; border-left: 4px solid {% if data.integrity.inconsistency_count > 0 %}var(--status-inconsistency){% elif data.integrity.verification_count > 0 %}var(--status-warning){% else %}var(--accent-green){% endif %};">
+    <div class="cyber-card-header">
+        <div class="card-title">
+            <i class="fa-solid fa-shield-halved"></i> Forensic Integrity Evaluation
+        </div>
+        <span class="status-badge {% if data.integrity.inconsistency_count > 0 %}status-inconsistency{% elif data.integrity.verification_count > 0 %}status-warning{% else %}status-found{% endif %}">
+            {{ data.integrity.overall_assessment }}
+        </span>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        {{ data.integrity.summary_note }}
+    </p>
+
+    <!-- Findings Table -->
+    <div style="overflow-x: auto;">
+        <table class="cyber-table">
+            <thead>
+                <tr>
+                    <th style="width: 200px;">Forensic Check</th>
+                    <th style="width: 160px;">Status</th>
+                    <th>Detected Fact</th>
+                    <th>Investigative Interpretation</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for finding in data.integrity.findings %}
+                <tr>
+                    <td class="table-field-name">{{ finding.check }}</td>
+                    <td>
+                        <span class="status-badge {{ finding.badge_class }}">{{ finding.status }}</span>
+                    </td>
+                    <td class="table-field-value">{{ finding.detected_fact }}</td>
+                    <td class="table-field-value" style="color: var(--text-secondary);">{{ finding.interpretation }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Categorized Tabs Container -->
+<div class="cyber-card cyber-tabs-container">
+    <div class="cyber-tabs">
+        <button type="button" class="tab-btn active" data-tab="tab-camera">
+            <i class="fa-solid fa-camera"></i> Camera &amp; Device
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-settings">
+            <i class="fa-solid fa-sliders"></i> Capture Settings
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-datetime">
+            <i class="fa-solid fa-clock"></i> Date &amp; Time
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-props">
+            <i class="fa-solid fa-image"></i> Image Properties
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-gps">
+            <i class="fa-solid fa-location-dot"></i> GPS &amp; Location
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-software">
+            <i class="fa-solid fa-microchip"></i> Software &amp; Metadata
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-raw">
+            <i class="fa-solid fa-list-check"></i> Raw EXIF Explorer ({{ data.all_exif_tags|length }})
+        </button>
+        <button type="button" class="tab-btn" data-tab="tab-ela">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Error Level Analysis (ELA)
+        </button>
+    </div>
+
+    <!-- Tab 1: Camera & Device -->
+    <div class="tab-pane active" id="tab-camera">
+        <table class="cyber-table">
+            <tbody>
+                <tr>
+                    <td class="table-field-name">Camera Manufacturer</td>
+                    <td class="table-field-value">{% if data.camera_device.make %}<strong>{{ data.camera_device.make }}</strong>{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Camera Model</td>
+                    <td class="table-field-value">{% if data.camera_device.model %}<strong>{{ data.camera_device.model }}</strong>{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Lens Manufacturer</td>
+                    <td class="table-field-value">{% if data.camera_device.lens_make %}{{ data.camera_device.lens_make }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Lens Model</td>
+                    <td class="table-field-value">{% if data.camera_device.lens_model %}{{ data.camera_device.lens_model }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Lens Specification</td>
+                    <td class="table-field-value">{% if data.camera_device.lens_specification %}{{ data.camera_device.lens_specification }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Camera Serial / Body ID</td>
+                    <td class="table-field-value mono">{% if data.camera_device.body_serial %}{{ data.camera_device.body_serial }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 2: Capture Settings -->
+    <div class="tab-pane" id="tab-settings">
+        <table class="cyber-table">
+            <tbody>
+                <tr>
+                    <td class="table-field-name">Exposure Time (Shutter)</td>
+                    <td class="table-field-value">{% if data.capture_settings.exposure_time %}<strong>{{ data.capture_settings.exposure_time }}</strong>{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Aperture (F-Number)</td>
+                    <td class="table-field-value">{% if data.capture_settings.f_number %}<strong>{{ data.capture_settings.f_number }}</strong>{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">ISO Speed Rating</td>
+                    <td class="table-field-value">{% if data.capture_settings.iso %}<strong>ISO {{ data.capture_settings.iso }}</strong>{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Focal Length</td>
+                    <td class="table-field-value">{% if data.capture_settings.focal_length %}{{ data.capture_settings.focal_length }} {% if data.capture_settings.focal_length_35mm %}({{ data.capture_settings.focal_length_35mm }}){% endif %}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Flash Mode</td>
+                    <td class="table-field-value">{% if data.capture_settings.flash %}{{ data.capture_settings.flash }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Orientation</td>
+                    <td class="table-field-value">{% if data.capture_settings.orientation %}{{ data.capture_settings.orientation }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Metering Mode</td>
+                    <td class="table-field-value">{% if data.capture_settings.metering_mode %}{{ data.capture_settings.metering_mode }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Exposure Program</td>
+                    <td class="table-field-value">{% if data.capture_settings.exposure_program %}{{ data.capture_settings.exposure_program }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 3: Date & Time -->
+    <div class="tab-pane" id="tab-datetime">
+        <div class="cyber-alert cyber-alert-info">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+                <strong>Forensic Disclaimer:</strong> {{ data.timestamps.forensic_disclaimer }}
+            </div>
+        </div>
+        <table class="cyber-table">
+            <tbody>
+                <tr>
+                    <td class="table-field-name">Capture Timestamp (DateTimeOriginal)</td>
+                    <td class="table-field-value">{% if data.timestamps.capture_timestamp %}<strong>{{ data.timestamps.capture_timestamp }}</strong>{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Digitized Timestamp (DateTimeDigitized)</td>
+                    <td class="table-field-value">{% if data.timestamps.digitized_timestamp %}{{ data.timestamps.digitized_timestamp }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Metadata Modified Timestamp (DateTime)</td>
+                    <td class="table-field-value">{% if data.timestamps.metadata_modified_timestamp %}{{ data.timestamps.metadata_modified_timestamp }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Timezone Offset</td>
+                    <td class="table-field-value">{% if data.timestamps.offset_time_original %}{{ data.timestamps.offset_time_original }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Filesystem Ingestion (Host Created)</td>
+                    <td class="table-field-value mono">{{ data.timestamps.filesystem_created_utc }}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Forensic Analysis Completed (UTC)</td>
+                    <td class="table-field-value mono" style="color: var(--accent-green);">{{ data.timestamps.analysis_completed_utc }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 4: Image Properties -->
+    <div class="tab-pane" id="tab-props">
+        <table class="cyber-table">
+            <tbody>
+                <tr>
+                    <td class="table-field-name">Encoded Format</td>
+                    <td class="table-field-value"><strong>{{ data.image_properties.format }}</strong></td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Pixel Dimensions</td>
+                    <td class="table-field-value">{{ data.summary.dimensions }} (Width: {{ data.image_properties.width }}px, Height: {{ data.image_properties.height }}px)</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Aspect Ratio</td>
+                    <td class="table-field-value">{{ data.summary.aspect_ratio or 'Unknown' }}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Resolution / Megapixels</td>
+                    <td class="table-field-value">{{ data.image_properties.megapixels }}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Color Mode</td>
+                    <td class="table-field-value">{{ data.image_properties.color_mode }}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Resolution DPI</td>
+                    <td class="table-field-value">{% if data.image_properties.dpi %}{{ data.image_properties.dpi }} DPI{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 5: GPS & Location -->
+    <div class="tab-pane" id="tab-gps">
+        {% if data.gps.has_gps %}
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <span class="status-badge status-found"><i class="fa-solid fa-satellite-dish"></i> GPS Coordinates Found</span>
+                    <span style="margin-left: 0.75rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--accent-cyan);">
+                        {{ data.gps.coordinates_formatted }}
+                    </span>
+                    <button type="button" class="copy-btn" onclick="copyToClipboard('{{ data.gps.latitude }}, {{ data.gps.longitude }}', this)">
+                        <i class="fa-regular fa-copy"></i> Copy Lat, Lon
+                    </button>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">
+                    DMS: {{ data.gps.dms_formatted }}
+                </div>
+            </div>
+
+            {% if data.gps.location_approximate %}
+            <div class="cyber-alert cyber-alert-info">
+                <i class="fa-solid fa-map-pin"></i>
+                <div>
+                    <strong>Approximate Location (OSM Nominatim):</strong><br/>
+                    {{ data.gps.location_approximate.display_name }}<br/>
+                    <small style="color: var(--text-muted);">{{ data.gps.location_approximate.disclaimer }}</small>
+                </div>
+            </div>
+            {% endif %}
+
+            <div id="leafletMap" class="forensic-map"></div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem;">
+                <i class="fa-solid fa-location-slash" style="font-size: 2.5rem; color: var(--status-na); margin-bottom: 1rem;"></i>
+                <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem;">GPS Data Unavailable</h3>
+                <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto; font-size: 0.85rem;">
+                    No geolocation metadata is embedded in this file. The camera may not have had a GPS module, location permissions were revoked, or coordinates were stripped prior to upload.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Tab 6: Software & Metadata -->
+    <div class="tab-pane" id="tab-software">
+        <table class="cyber-table">
+            <tbody>
+                <tr>
+                    <td class="table-field-name">Software Application</td>
+                    <td class="table-field-value">{% if data.software_metadata.software %}<strong>{{ data.software_metadata.software }}</strong>{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Artist / Creator</td>
+                    <td class="table-field-value">{% if data.software_metadata.artist %}{{ data.software_metadata.artist }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Copyright Notice</td>
+                    <td class="table-field-value">{% if data.software_metadata.copyright %}{{ data.software_metadata.copyright }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">Image Description</td>
+                    <td class="table-field-value">{% if data.software_metadata.image_description %}{{ data.software_metadata.image_description }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">User Comment</td>
+                    <td class="table-field-value">{% if data.software_metadata.user_comment %}{{ data.software_metadata.user_comment }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+                <tr>
+                    <td class="table-field-name">EXIF Standard Version</td>
+                    <td class="table-field-value mono">{% if data.software_metadata.exif_version %}{{ data.software_metadata.exif_version }}{% else %}<span class="not-available-text">Not available in this file</span>{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tab 7: Raw EXIF Explorer -->
+    <div class="tab-pane" id="tab-raw">
+        {% if data.all_exif_tags %}
+            <div style="margin-bottom: 1rem;">
+                <input type="text" id="exifSearchInput" placeholder="Filter EXIF tags by name or value..." 
+                       style="width: 100%; background: var(--bg-tertiary); border: 1px solid var(--border-color); color: #fff; padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem;"
+                       onkeyup="filterExifTags()">
+            </div>
+            <div style="max-height: 480px; overflow-y: auto;">
+                <table class="cyber-table" id="rawExifTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 250px;">EXIF Tag Name</th>
+                            <th>Extracted Raw Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tag, val in data.all_exif_tags.items() %}
+                        <tr class="exif-row">
+                            <td class="table-field-name mono">{{ tag }}</td>
+                            <td class="table-field-value mono">{{ val }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-file-excel" style="font-size: 2rem; margin-bottom: 0.75rem;"></i>
+                <p>No raw EXIF tags embedded in this file.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Tab 8: Error Level Analysis (ELA) -->
+    <div class="tab-pane" id="tab-ela">
+        {% if data.ela and data.ela.available %}
+            <div class="cyber-alert cyber-alert-warning" style="margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <strong>FORENSIC NOTICE:</strong> {{ data.ela.disclaimer }}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; justify-items: center;">
+                <div style="background: #000; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); max-width: 100%;">
+                    <img src="{{ data.ela.ela_image_base64 }}" alt="Error Level Analysis" style="max-width: 100%; height: auto; display: block; border-radius: var(--radius-sm);">
+                </div>
+
+                <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary); width: 100%;">
+                    <strong style="color: var(--accent-cyan);"><i class="fa-solid fa-circle-question"></i> Interpretation Guidance:</strong><br/>
+                    {{ data.ela.explanation }}
+                </div>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <i class="fa-solid fa-ban" style="font-size: 2rem; margin-bottom: 0.75rem;"></i>
+                <p>ELA generation is not available for this file type or compression stream.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script>
+    // Live EXIF tag filter
+    function filterExifTags() {
+        const input = document.getElementById("exifSearchInput");
+        const filter = input.value.toLowerCase();
+        const rows = document.querySelectorAll(".exif-row");
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    }
+
+    // Auto-init GPS Map if coordinates exist
+    document.addEventListener("DOMContentLoaded", () => {
+        {% if data.gps.has_gps %}
+            window.initForensicMap({{ data.gps.latitude }}, {{ data.gps.longitude }}, "{{ data.summary.original_filename }}");
+        {% endif %}
+    });
+</script>
+{% endblock %}

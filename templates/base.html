@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PhotoTrace AI — Digital Photo Forensics & Metadata Analyzer{% endblock %}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <!-- Leaflet CSS for GPS maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- App CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="cyber-body">
+    <!-- Cyber Grid Background Animation -->
+    <div class="cyber-grid-overlay"></div>
+    <div class="ambient-glow cyan-glow"></div>
+    <div class="ambient-glow green-glow"></div>
+
+    <!-- Navigation Header -->
+    <header class="cyber-navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="brand-link">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-fingerprint"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">PHOTOTRACE <span class="accent-text">AI</span></span>
+                    <span class="brand-badge">FORENSICS v1.0</span>
+                </div>
+            </a>
+
+            <nav class="nav-menu" id="navMenu">
+                <a href="{{ url_for('index') }}" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-crosshairs"></i> Analysis Dashboard
+                </a>
+                <a href="{{ url_for('compare_page') }}" class="nav-item {% if request.endpoint == 'compare_page' %}active{% endif %}">
+                    <i class="fa-solid fa-code-compare"></i> Origin & Sharing
+                </a>
+                <a href="{{ url_for('history_page') }}" class="nav-item {% if request.endpoint == 'history_page' %}active{% endif %}">
+                    <i class="fa-solid fa-clock-rotate-left"></i> History
+                </a>
+                <a href="{{ url_for('privacy_page') }}" class="nav-item {% if request.endpoint == 'privacy_page' %}active{% endif %}">
+                    <i class="fa-solid fa-shield-halved"></i> Privacy & Limits
+                </a>
+            </nav>
+
+            <div class="nav-actions">
+                <div class="system-status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span class="status-label">ENGINE READY</span>
+                </div>
+                <a href="{{ url_for('dashboard') }}" class="btn-cyber-primary btn-sm">
+                    <i class="fa-solid fa-upload"></i> Upload Evidence
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Notification Banner Container -->
+    <div id="notificationArea" class="notification-area"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="cyber-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="brand-title">PHOTOTRACE <span class="accent-text">AI</span></div>
+                <p class="footer-desc">
+                    Professional, rule-based digital photo forensics and EXIF telemetry analyzer.
+                    Strict evidence handling, zero cloud telemetry by default, and factual reporting.
+                </p>
+                <div class="footer-seal">
+                    <i class="fa-solid fa-shield-check text-green"></i> Local Processing &middot; SHA-256 Hashing &middot; Tamper Detection
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-heading">Capabilities</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chevron-right"></i> Deep EXIF Extraction</a></li>
+                    <li><a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chevron-right"></i> GPS Geolocation Parsing</a></li>
+                    <li><a href="{{ url_for('compare_page') }}"><i class="fa-solid fa-chevron-right"></i> Multi-Copy Origin Comparator</a></li>
+                    <li><a href="{{ url_for('dashboard') }}"><i class="fa-solid fa-chevron-right"></i> Error Level Analysis (ELA)</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-heading">Forensic Principles</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('privacy_page') }}#limitations"><i class="fa-solid fa-chevron-right"></i> Non-Invention of Data</a></li>
+                    <li><a href="{{ url_for('privacy_page') }}#stripping"><i class="fa-solid fa-chevron-right"></i> Social Media Stripping</a></li>
+                    <li><a href="{{ url_for('privacy_page') }}#local"><i class="fa-solid fa-chevron-right"></i> Safe Local Cleanup</a></li>
+                    <li><a href="{{ url_for('privacy_page') }}"><i class="fa-solid fa-chevron-right"></i> Legal Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">
+                &copy; PhotoTrace AI Forensic Engine. All evidentiary rights reserved. Built for security analysts, investigators, and researchers.
+            </div>
+            <div class="footer-hash-badge">
+                <i class="fa-solid fa-terminal"></i> SHA-256 VERIFIED
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Base Scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

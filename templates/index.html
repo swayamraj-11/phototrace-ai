@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}PhotoTrace AI — Digital Photo Forensics & Metadata Analyzer{% endblock %}
+
+{% block content %}
+<div class="hero-section" style="text-align: center; padding: 3rem 1rem 4rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.3); padding: 0.35rem 1rem; border-radius: 20px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan); margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-microchip"></i> CYBERSECURITY &amp; DIGITAL FORENSICS PLATFORM
+    </div>
+    
+    <h1 style="font-size: 3rem; font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem; letter-spacing: -0.5px;">
+        Digital Photo Forensics &amp; <br/>
+        <span style="background: linear-gradient(135deg, #00f0ff, #00ff9d); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Metadata Telemetry Analyzer
+        </span>
+    </h1>
+
+    <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 760px; margin: 0 auto 2.5rem; line-height: 1.6;">
+        Inspect real embedded EXIF metadata, verify cryptographic SHA-256 evidence integrity,
+        pinpoint GPS capture coordinates, uncover post-processing edits, and compare multi-source image variants.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('dashboard') }}" class="btn-cyber-primary" style="font-size: 1.05rem; padding: 0.85rem 2rem;">
+            <i class="fa-solid fa-crosshairs"></i> Open Analysis Dashboard
+        </a>
+        <a href="{{ url_for('compare_page') }}" class="btn-cyber-outline" style="font-size: 1.05rem; padding: 0.85rem 2rem;">
+            <i class="fa-solid fa-code-compare"></i> Origin &amp; Sharing Investigation
+        </a>
+    </div>
+</div>
+
+<!-- Core Capabilities Grid -->
+<div style="margin-bottom: 4rem;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #fff;">Forensic Analysis Modules</h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">Pure rule-based forensic verification — no hallucinated data.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <!-- Card 1 -->
+        <div class="cyber-card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(0, 240, 255, 0.1); border: 1px solid var(--accent-cyan); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-camera"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">Exhaustive EXIF Extraction</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                Recovers Make, Model, Lens, Shutter Speed, Aperture, ISO, Focal Length, Flash mode, and orientation directly from binary headers without modifying evidence.
+            </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="cyber-card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(0, 255, 157, 0.1); border: 1px solid var(--accent-green); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 1.3rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-location-crosshairs"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">GPS Coordinate &amp; Map Viewer</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                Parses GPS DMS fractions into WGS84 decimal coordinates with precision range validation and interactive Leaflet map rendering with approximate reverse geocoding.
+            </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="cyber-card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(255, 183, 0, 0.1); border: 1px solid var(--status-warning); display: flex; align-items: center; justify-content: center; color: var(--status-warning); font-size: 1.3rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-shield-virus"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">Explainable Integrity Checks</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                Detects editing software footprints (Photoshop, GIMP, Canva, AI models), timestamp paradoxes, resolution discrepancies, and metadata stripping without making unfounded claims.
+            </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="cyber-card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(0, 240, 255, 0.1); border: 1px solid var(--accent-cyan); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-code-compare"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">Origin &amp; Sharing Comparator</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                Cross-examines multiple supplied copies, establishes SHA-256 matches, detects downscaling/compression, and builds an evidence timeline identifying the earliest supplied copy.
+            </p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="cyber-card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(255, 65, 108, 0.1); border: 1px solid var(--status-inconsistency); display: flex; align-items: center; justify-content: center; color: var(--status-inconsistency); font-size: 1.3rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">Error Level Analysis (ELA)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                Experimental compression artifact visualization amplifying pixel error rates across compression boundaries to highlight potential re-saved or composite regions.
+            </p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="cyber-card">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(0, 255, 157, 0.1); border: 1px solid var(--accent-green); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 1.3rem; margin-bottom: 1rem;">
+                <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: #fff;">Forensic PDF &amp; JSON Export</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                Exports audit-ready forensic PDF reports via ReportLab with SHA-256 hashes, telemetry tables, integrity findings, and machine-readable JSON for integration into casework.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Ethical & Security Callout -->
+<div class="cyber-card" style="border-left: 4px solid var(--accent-cyan); margin-bottom: 2rem;">
+    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+        <i class="fa-solid fa-user-shield" style="font-size: 1.8rem; color: var(--accent-cyan); margin-top: 4px;"></i>
+        <div>
+            <h3 style="font-size: 1.1rem; color: #fff; margin-bottom: 0.5rem;">Forensic Integrity &amp; Strict Privacy Notice</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.5rem;">
+                PhotoTrace AI operates on local server processing with strict evidence handling. Uploaded images are kept in secure, temporary storage and automatically purged after extraction. We do not permanently store photos by default or send them to third-party AI generators.
+            </p>
+            <div style="display: flex; gap: 1rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-green);">
+                <span><i class="fa-solid fa-check"></i> Non-Destructive</span>
+                <span><i class="fa-solid fa-check"></i> SHA-256 Hashed</span>
+                <span><i class="fa-solid fa-check"></i> Decompression Bomb Protected</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

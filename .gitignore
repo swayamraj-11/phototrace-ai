@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.secret
+
+# Flask instance and local databases
+instance/
+*.sqlite
+*.sqlite3
+*.db
+
+# Testing and coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and runtime dumps
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Uploaded evidence, test photos, and report outputs
+# Keeps user data and private evidence strictly out of source control
+sample_evidence/
+temp/
+tmp/
+*.tmp
+*.pdf
+*.json
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.tiff
+*.tif
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE configuration
+.vscode/
+.idea/
+*.swp
+*.swo

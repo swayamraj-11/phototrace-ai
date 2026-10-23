@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Dashboard — PhotoTrace AI{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-crosshairs text-cyan" style="color: var(--accent-cyan);"></i> Forensic Evidence Workspace
+    </h1>
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+        Upload digital image evidence for automated EXIF extraction, cryptographic verification, and tamper detection.
+    </p>
+</div>
+
+{% if error_message %}
+<div class="cyber-alert cyber-alert-danger" style="margin-bottom: 1.5rem;">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <div>{{ error_message }}</div>
+</div>
+{% endif %}
+
+<!-- Upload Dropzone -->
+<div class="upload-dropzone" id="uploadDropzone">
+    <!-- Animated Scanning Laser Overlay -->
+    <div class="scanning-overlay" id="scanningOverlay">
+        <div class="scanning-laser"></div>
+        <div class="scanner-spinner"></div>
+        <div class="scanner-status-text" id="scanStatusText">Initializing forensic scanner...</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">
+            Calculating SHA-256 &middot; Parsing EXIF &middot; Generating ELA
+        </div>
+    </div>
+
+    <!-- Dropzone Default View -->
+    <div class="dropzone-radar">
+        <div class="radar-sweep"></div>
+        <i class="fa-solid fa-file-shield"></i>
+    </div>
+
+    <div class="dropzone-title">Drop Digital Image Evidence Here</div>
+    <div class="dropzone-subtitle">or click to browse your local filesystem</div>
+
+    <input type="file" id="evidenceFileInput" accept=".jpg,.jpeg,.png,.tiff,.tif,.webp" style="display: none;">
+
+    <div class="dropzone-tags">
+        <span class="format-tag">JPEG / JPG</span>
+        <span class="format-tag">PNG</span>
+        <span class="format-tag">TIFF / TIF</span>
+        <span class="format-tag">WebP</span>
+        <span class="format-tag" style="color: var(--accent-green);"><i class="fa-solid fa-shield-halved"></i> Max 32 MB</span>
+    </div>
+</div>
+
+<!-- Quick Navigation Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 2rem;">
+    <a href="{{ url_for('compare_page') }}" class="cyber-card" style="text-decoration: none; display: flex; gap: 1rem; align-items: center;">
+        <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: rgba(0, 240, 255, 0.1); border: 1px solid var(--accent-cyan); display: flex; align-items: center; justify-content: center; color: var(--accent-cyan); font-size: 1.2rem; flex-shrink: 0;">
+            <i class="fa-solid fa-code-compare"></i>
+        </div>
+        <div>
+            <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.2rem;">Multi-Copy Origin Investigation</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">Cross-examine 2-6 image copies for SHA-256 matches &amp; timeline.</p>
+        </div>
+    </a>
+
+    <a href="{{ url_for('history_page') }}" class="cyber-card" style="text-decoration: none; display: flex; gap: 1rem; align-items: center;">
+        <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: rgba(0, 255, 157, 0.1); border: 1px solid var(--accent-green); display: flex; align-items: center; justify-content: center; color: var(--accent-green); font-size: 1.2rem; flex-shrink: 0;">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <div>
+            <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.2rem;">Active Session History</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">Inspect or re-export previously processed evidence reports.</p>
+        </div>
+    </a>
+
+    <a href="{{ url_for('privacy_page') }}" class="cyber-card" style="text-decoration: none; display: flex; gap: 1rem; align-items: center;">
+        <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: rgba(255, 183, 0, 0.1); border: 1px solid var(--status-warning); display: flex; align-items: center; justify-content: center; color: var(--status-warning); font-size: 1.2rem; flex-shrink: 0;">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+            <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.2rem;">Privacy &amp; Forensic Limitations</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">Learn how local processing and metadata sanitization operate.</p>
+        </div>
+    </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}
